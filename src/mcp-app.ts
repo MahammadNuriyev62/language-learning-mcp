@@ -143,7 +143,16 @@ app.ontoolinputpartial = (params: any) => {
   const args = params.arguments;
   if (!args) return;
   isStreaming = true;
-  currentMode = detectMode(args);
+  const newMode = detectMode(args);
+
+  // If we're already streaming a mode and the new partial doesn't parse
+  // as anything (truncated JSON), keep the current DOM intact
+  if (!newMode && currentMode) return;
+
+  // If we're streaming a test and the new partial still parses as test,
+  // only update args (sections may have grown). If it parsed as something
+  // else entirely, let it switch.
+  currentMode = newMode;
   currentArgs = args;
   if (renderTimer) return;
   renderTimer = setTimeout(() => {

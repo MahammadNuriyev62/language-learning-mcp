@@ -37,6 +37,10 @@ export function streamTest(appEl: HTMLElement, args: TestArgs): HTMLElement {
   const renderedSections = container.querySelectorAll<HTMLElement>(".test-section");
   const renderedCount = renderedSections.length;
 
+  // Guard: if the partial parse shows fewer sections than we've already
+  // rendered, the JSON is likely truncated mid-array. Don't touch the DOM.
+  if (sections.length < renderedCount) return container;
+
   // Update the last rendered section (it may have been incomplete during previous partial)
   if (renderedCount > 0) {
     const lastIdx = renderedCount - 1;
@@ -44,7 +48,11 @@ export function streamTest(appEl: HTMLElement, args: TestArgs): HTMLElement {
     if (lastSection) {
       const lastEl = renderedSections[lastIdx];
       const emptySectionState: SectionState = { answers: {} };
-      lastEl.innerHTML = buildSectionHtml(lastSection, lastIdx, emptySectionState);
+      const newHtml = buildSectionHtml(lastSection, lastIdx, emptySectionState);
+      // Only update if content actually changed (avoids input field reset)
+      if (lastEl.innerHTML !== newHtml) {
+        lastEl.innerHTML = newHtml;
+      }
     }
   }
 
