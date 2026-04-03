@@ -16,15 +16,17 @@ import { renderFillBlank, type FillBlankArgs } from "./modes/fill-blank";
 import { renderMatching, type MatchingArgs } from "./modes/matching";
 import { renderScramble, type ScrambleArgs } from "./modes/scramble";
 import { renderConversation, type ConversationArgs } from "./modes/conversation";
+import { renderTest, type TestArgs } from "./modes/test/index";
 import "./mcp-app.css";
 
 const appEl = document.getElementById("app")!;
 
-type Mode = "pronounce" | "flashcards" | "quiz" | "listening" | "sentence" | "fill_blank" | "matching" | "scramble" | "conversation" | null;
+type Mode = "pronounce" | "flashcards" | "quiz" | "listening" | "sentence" | "fill_blank" | "matching" | "scramble" | "conversation" | "test" | null;
 let currentMode: Mode = null;
 let currentArgs: any = null;
 
 function detectMode(args: any): Mode {
+  if (args?.sections) return "test";
   if (args?.cards) return "flashcards";
   if (args?.questions) return "quiz";
   if (args?.pairs) return "matching";
@@ -82,6 +84,9 @@ function render() {
       break;
     case "conversation":
       renderConversation(container, args as ConversationArgs, app);
+      break;
+    case "test":
+      renderTest(container, args as TestArgs, app);
       break;
   }
 

@@ -741,3 +741,174 @@ body {
 .convo-choice:active {
   transform: scale(0.97);
 }
+
+/* ── Proficiency Test ────────────────────────────────────────── */
+
+.test-header {
+  text-align: center;
+  padding: 16px 0 20px;
+  border-bottom: 2px solid var(--color-border-secondary, light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.1)));
+  margin-bottom: 20px;
+}
+
+.test-title {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold, 700);
+}
+
+.test-subtitle {
+  font-size: var(--font-text-sm-size, 0.875rem);
+  color: var(--color-text-secondary, light-dark(#6b7280, #9ca3af));
+  margin-top: 2px;
+}
+
+.test-section {
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border-secondary, light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.08)));
+}
+
+.test-section:last-of-type {
+  border-bottom: none;
+}
+
+.test-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.test-section-num {
+  font-size: var(--font-text-sm-size, 0.875rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-info, light-dark(#4338ca, #818cf8));
+}
+
+.test-section-title {
+  font-weight: var(--font-weight-semibold, 600);
+  font-size: var(--font-text-md-size, 1rem);
+}
+
+.test-section-type {
+  font-size: var(--font-text-sm-size, 0.75rem);
+  color: var(--color-text-tertiary, light-dark(#9ca3af, #6b7280));
+  margin-left: auto;
+}
+
+.test-instructions {
+  font-size: var(--font-text-sm-size, 0.875rem);
+  color: var(--color-text-secondary, light-dark(#6b7280, #9ca3af));
+  font-style: italic;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--color-background-secondary, light-dark(rgba(0,0,0,0.03), rgba(255,255,255,0.04)));
+  border-radius: var(--border-radius-md, 8px);
+}
+
+.test-passage {
+  padding: 12px 16px;
+  background: var(--color-background-secondary, light-dark(rgba(0,0,0,0.03), rgba(255,255,255,0.04)));
+  border-radius: var(--border-radius-md, 8px);
+  margin-bottom: 16px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.test-question {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.test-q-num {
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-secondary, light-dark(#6b7280, #9ca3af));
+  min-width: 24px;
+  padding-top: 2px;
+}
+
+.test-q-body {
+  flex: 1;
+}
+
+.test-q-prompt {
+  font-weight: var(--font-weight-semibold, 600);
+  margin-bottom: 8px;
+}
+
+.test-listen-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.test-listen-num {
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-secondary, light-dark(#6b7280, #9ca3af));
+  min-width: 24px;
+}
+
+.test-listen-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--color-text-info, light-dark(#4338ca, #818cf8));
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-info, light-dark(#4338ca, #818cf8));
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.test-listen-play:hover {
+  background: var(--color-background-secondary, light-dark(rgba(0,0,0,0.03), rgba(255,255,255,0.05)));
+}
+
+.test-listen-input {
+  flex: 1;
+}
+
+.test-fill-item {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  line-height: 2.4;
+}
+
+.test-fill-num {
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-secondary, light-dark(#6b7280, #9ca3af));
+  min-width: 24px;
+}
+
+.test-fill-text {
+  flex: 1;
+}
+
+.test-fill-hint {
+  font-size: var(--font-text-sm-size, 0.75rem);
+  color: var(--color-text-tertiary, light-dark(#9ca3af, #6b7280));
+  margin: -4px 0 8px 28px;
+  font-style: italic;
+}
+
+.test-sentence-item {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.test-submit-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 8px auto 0;
+  padding: 12px 24px;
+  font-size: var(--font-text-md-size, 1rem);
+}

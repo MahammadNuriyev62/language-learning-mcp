@@ -222,6 +222,56 @@ function createServer(baseUrl: string): McpServer {
     _meta: { viewUUID: crypto.randomUUID() },
   }));
 
+  // 10. Proficiency Test
+  const sectionSchema = z.object({
+    type: z.enum(["reading", "listening", "fill_blank", "quiz", "matching", "sentence"])
+      .describe("Section exercise type"),
+    title: z.string().describe("Section title"),
+    instructions: z.string().optional().describe("Instructions shown before the section"),
+    passage: z.string().optional().describe("Reading passage (for 'reading' type)"),
+    questions: z.array(z.object({
+      prompt: z.string(),
+      options: z.array(z.string()),
+    })).optional().describe("Questions (for 'reading' and 'quiz' types)"),
+    words: z.array(z.object({
+      word: z.string(),
+      hint: z.string().optional(),
+    })).optional().describe("Words to dictate (for 'listening' type)"),
+    sentences: z.array(z.object({
+      text: z.string(),
+      hint: z.string().optional(),
+    })).optional().describe("Sentences with ___ blanks (for 'fill_blank' type)"),
+    pairs: z.array(z.object({
+      left: z.string(),
+      right: z.string(),
+    })).optional().describe("Matching pairs (for 'matching' type)"),
+    exercises: z.array(z.object({
+      shuffledWords: z.array(z.string()),
+      translation: z.string(),
+      hint: z.string().optional(),
+    })).optional().describe("Sentence building exercises (for 'sentence' type)"),
+  });
+
+  registerAppTool(server, "proficiency_test", {
+    title: "Proficiency Test",
+    description:
+      "Render a multi-section language proficiency test on a single long page, " +
+      "similar to DELF/TOEFL. Combines reading comprehension, listening, fill-in-the-blank, " +
+      "multiple choice, matching, and sentence building in one exam. " +
+      "All sections appear on one scrollable page. User works through them freely " +
+      "and clicks Submit when done. The widget collects ALL responses across ALL " +
+      "sections and sends them via updateModelContext. You then grade the entire test.",
+    inputSchema: {
+      title: z.string().describe("Test title (e.g. 'French A2 Practice Test')"),
+      language: z.string().describe("BCP 47 language tag for TTS"),
+      sections: z.array(sectionSchema).describe("Ordered array of test sections"),
+    },
+    ...uiMeta,
+  }, async ({ title, sections }) => ({
+    content: [{ type: "text", text: `Proficiency test "${title}" with ${sections.length} sections` }],
+    _meta: { viewUUID: crypto.randomUUID() },
+  }));
+
   // Register shared UI resource
   registerAppResource(server, resourceUri, resourceUri, { mimeType: RESOURCE_MIME_TYPE },
     async () => ({

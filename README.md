@@ -15,6 +15,7 @@ Interactive language learning MCP App for [Claude.ai](https://claude.ai). Render
 | `matching` | Two-column tap-to-match pairs |
 | `word_scramble` | Rearrange scrambled letters |
 | `conversation` | Chat-style dialogue with response choices |
+| `proficiency_test` | Multi-section exam (DELF/TOEFL style) on one page |
 
 ## Connect
 
