@@ -17,6 +17,7 @@ import { renderMatching, type MatchingArgs } from "./modes/matching";
 import { renderScramble, type ScrambleArgs } from "./modes/scramble";
 import { renderConversation, type ConversationArgs } from "./modes/conversation";
 import { renderTest, type TestArgs } from "./modes/test/index";
+import { streamTest } from "./modes/test/streaming";
 import "./mcp-app.css";
 
 const appEl = document.getElementById("app")!;
@@ -63,26 +64,9 @@ function render() {
 
   if (args.language) setLanguage(args.language);
 
-  // During streaming, show a lightweight preview for test mode
-  // to avoid destroying interactive DOM on every partial update
+  // During streaming, incrementally append new sections without nuking the DOM
   if (isStreaming && mode === "test") {
-    const testArgs = args as TestArgs;
-    const sectionCount = testArgs.sections?.length ?? 0;
-    const sectionNames = (testArgs.sections || []).map((s: any) => s.title || s.type || "...").filter(Boolean);
-    container.innerHTML = `
-      <div class="test-header">
-        <div class="test-title">${testArgs.title ? escapeHtml(testArgs.title) : "Loading..."}</div>
-        <div class="test-subtitle">Building test... ${sectionCount} section${sectionCount !== 1 ? "s" : ""}</div>
-      </div>
-      <div class="test-preview-sections">
-        ${sectionNames.map((name: string, i: number) => `
-          <div class="test-preview-item">
-            <span class="test-section-num">Section ${i + 1}</span>
-            <span>${escapeHtml(name)}</span>
-          </div>
-        `).join("")}
-      </div>
-    `;
+    streamTest(appEl, args as TestArgs);
     resizeToContent();
     return;
   }
