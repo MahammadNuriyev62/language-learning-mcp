@@ -56,12 +56,6 @@ function render() {
     return;
   }
 
-  // Clear and create fresh container to avoid stale event listeners
-  appEl.innerHTML = "";
-  const container = document.createElement("div");
-  container.className = `ll-mode ll-mode-${mode}`;
-  appEl.appendChild(container);
-
   if (args.language) setLanguage(args.language);
 
   // During streaming, incrementally append new sections without nuking the DOM
@@ -70,6 +64,12 @@ function render() {
     resizeToContent();
     return;
   }
+
+  // Clear and create fresh container to avoid stale event listeners
+  appEl.innerHTML = "";
+  const container = document.createElement("div");
+  container.className = `ll-mode ll-mode-${mode}`;
+  appEl.appendChild(container);
 
   switch (mode) {
     case "pronounce":
