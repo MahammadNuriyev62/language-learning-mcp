@@ -1,8 +1,6 @@
 # language-learning-mcp
 
-Interactive language learning MCP App for [Claude.ai](https://claude.ai). Renders flashcards, quizzes, listening tests, and sentence builders directly in chat.
-
-The widget collects responses; Claude evaluates them.
+Interactive language learning MCP App for [Claude.ai](https://claude.ai). Renders exercises directly in chat with TTS pronunciation. The widget collects responses; Claude evaluates them.
 
 ## Tools
 
@@ -13,6 +11,10 @@ The widget collects responses; Claude evaluates them.
 | `quiz` | Multiple choice questions |
 | `listening_test` | TTS playback + typed dictation |
 | `sentence_builder` | Tap-to-place word tiles |
+| `fill_blank` | Sentences with blanks to fill in |
+| `matching` | Two-column tap-to-match pairs |
+| `word_scramble` | Rearrange scrambled letters |
+| `conversation` | Chat-style dialogue with response choices |
 
 ## Connect
 
