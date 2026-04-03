@@ -1,0 +1,8 @@
+name = "language-learning-mcp"
+main = "worker.ts"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+rules = [
+  { type = "Text", globs = ["**/*.html", "**/*.svg"], fallthrough = false }
+]

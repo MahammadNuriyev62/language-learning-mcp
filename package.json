@@ -1,0 +1,25 @@
+{
+  "name": "language-learning-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Interactive language learning MCP App with flashcards, quizzes, listening tests, and sentence builders",
+  "scripts": {
+    "build:ui": "cross-env INPUT=mcp-app.html vite build",
+    "dev": "cross-env NODE_ENV=development INPUT=mcp-app.html vite build --watch",
+    "deploy": "npm run build:ui && wrangler deploy"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.24.0",
+    "agents": "^0.7.7",
+    "marked": "^17.0.5",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.0",
+    "vite-plugin-singlefile": "^2.3.0",
+    "wrangler": "^4.75.0"
+  }
+}

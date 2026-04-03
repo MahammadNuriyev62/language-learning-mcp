@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <rect width="128" height="128" rx="28" fill="#10b981"/>
+  <g transform="translate(28,24) scale(3)">
+    <text x="12" y="18" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">Aa</text>
+    <path d="M4 24 L20 24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>
