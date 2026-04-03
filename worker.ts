@@ -132,6 +132,96 @@ function createServer(baseUrl: string): McpServer {
     _meta: { viewUUID: crypto.randomUUID() },
   }));
 
+  // 6. Fill in the Blank
+  registerAppTool(server, "fill_blank", {
+    title: "Fill in the Blank",
+    description:
+      "Render an interactive fill-in-the-blank exercise. Each sentence contains one " +
+      "or more blanks marked with '___'. User types the missing word(s). " +
+      "The widget does NOT check answers. It collects all user inputs and sends " +
+      "them back via updateModelContext. You then evaluate correctness.",
+    inputSchema: {
+      title: z.string().describe("Exercise title"),
+      language: z.string().describe("BCP 47 language tag for TTS"),
+      sentences: z.array(z.object({
+        text: z.string().describe("Sentence with ___ for blanks (e.g. 'Je ___ au marché')"),
+        hint: z.string().optional().describe("Optional grammar/vocabulary hint"),
+      })).describe("Array of sentences with blanks"),
+    },
+    ...uiMeta,
+  }, async ({ title, sentences }) => ({
+    content: [{ type: "text", text: `Fill in the blank "${title}" with ${sentences.length} sentences` }],
+    _meta: { viewUUID: crypto.randomUUID() },
+  }));
+
+  // 7. Matching Pairs
+  registerAppTool(server, "matching", {
+    title: "Matching Pairs",
+    description:
+      "Render an interactive matching exercise with two columns. User taps one " +
+      "item from the left column and one from the right to create a pair. " +
+      "The widget does NOT check correctness. It collects all user matches and " +
+      "sends them back via updateModelContext. You then evaluate accuracy.",
+    inputSchema: {
+      title: z.string().describe("Exercise title"),
+      language: z.string().describe("BCP 47 language tag for TTS"),
+      pairs: z.array(z.object({
+        left: z.string().describe("Left column item (e.g. word in target language)"),
+        right: z.string().describe("Right column item (e.g. translation)"),
+      })).describe("Array of correct pairs (right column is shuffled in UI)"),
+    },
+    ...uiMeta,
+  }, async ({ title, pairs }) => ({
+    content: [{ type: "text", text: `Matching pairs "${title}" with ${pairs.length} pairs` }],
+    _meta: { viewUUID: crypto.randomUUID() },
+  }));
+
+  // 8. Word Scramble
+  registerAppTool(server, "word_scramble", {
+    title: "Word Scramble",
+    description:
+      "Render an interactive word scramble exercise. Letters of a word are shown " +
+      "scrambled, user taps letters to form the correct word. " +
+      "The widget does NOT check spelling. It collects all user arrangements and " +
+      "sends them back via updateModelContext. You then evaluate correctness.",
+    inputSchema: {
+      title: z.string().describe("Exercise title"),
+      language: z.string().describe("BCP 47 language tag for TTS"),
+      words: z.array(z.object({
+        scrambled: z.string().describe("Scrambled letters (e.g. 'ojnruob' for 'bonjour')"),
+        hint: z.string().optional().describe("Optional hint (e.g. definition or translation)"),
+      })).describe("Array of scrambled words"),
+    },
+    ...uiMeta,
+  }, async ({ title, words }) => ({
+    content: [{ type: "text", text: `Word scramble "${title}" with ${words.length} words` }],
+    _meta: { viewUUID: crypto.randomUUID() },
+  }));
+
+  // 9. Conversation
+  registerAppTool(server, "conversation", {
+    title: "Conversation Practice",
+    description:
+      "Render an interactive conversation/dialogue exercise. Shows a chat-like " +
+      "dialogue between speakers. At certain points, the user picks from response " +
+      "options to continue the conversation. Turns without options are NPC lines " +
+      "shown automatically. The widget does NOT evaluate responses. It collects " +
+      "all user choices and sends them via updateModelContext.",
+    inputSchema: {
+      title: z.string().describe("Conversation title/scenario"),
+      language: z.string().describe("BCP 47 language tag for TTS"),
+      turns: z.array(z.object({
+        speaker: z.string().describe("Speaker name (e.g. 'Waiter', 'Marie'). Ignored for user turns."),
+        text: z.string().describe("What this speaker says. For user turns, this is a prompt/context (not shown)."),
+        options: z.array(z.string()).optional().describe("If present, this is a user turn: 2-4 response choices"),
+      })).describe("Array of dialogue turns in order"),
+    },
+    ...uiMeta,
+  }, async ({ title, turns }) => ({
+    content: [{ type: "text", text: `Conversation "${title}" with ${turns.length} turns` }],
+    _meta: { viewUUID: crypto.randomUUID() },
+  }));
+
   // Register shared UI resource
   registerAppResource(server, resourceUri, resourceUri, { mimeType: RESOURCE_MIME_TYPE },
     async () => ({

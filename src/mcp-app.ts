@@ -12,17 +12,25 @@ import { renderFlashcards, type FlashcardArgs } from "./modes/flashcards";
 import { renderQuiz, type QuizArgs } from "./modes/quiz";
 import { renderListening, type ListeningArgs } from "./modes/listening";
 import { renderSentence, type SentenceArgs } from "./modes/sentence";
+import { renderFillBlank, type FillBlankArgs } from "./modes/fill-blank";
+import { renderMatching, type MatchingArgs } from "./modes/matching";
+import { renderScramble, type ScrambleArgs } from "./modes/scramble";
+import { renderConversation, type ConversationArgs } from "./modes/conversation";
 import "./mcp-app.css";
 
 const appEl = document.getElementById("app")!;
 
-type Mode = "pronounce" | "flashcards" | "quiz" | "listening" | "sentence" | null;
+type Mode = "pronounce" | "flashcards" | "quiz" | "listening" | "sentence" | "fill_blank" | "matching" | "scramble" | "conversation" | null;
 let currentMode: Mode = null;
 let currentArgs: any = null;
 
 function detectMode(args: any): Mode {
   if (args?.cards) return "flashcards";
   if (args?.questions) return "quiz";
+  if (args?.pairs) return "matching";
+  if (args?.turns) return "conversation";
+  if (args?.sentences) return "fill_blank";
+  if (args?.words && args?.title && args?.words[0]?.scrambled !== undefined) return "scramble";
   if (args?.words && args?.title) return "listening";
   if (args?.exercises) return "sentence";
   if (args?.text) return "pronounce";
@@ -62,6 +70,18 @@ function render() {
       break;
     case "sentence":
       renderSentence(container, args as SentenceArgs, app);
+      break;
+    case "fill_blank":
+      renderFillBlank(container, args as FillBlankArgs, app);
+      break;
+    case "matching":
+      renderMatching(container, args as MatchingArgs, app);
+      break;
+    case "scramble":
+      renderScramble(container, args as ScrambleArgs, app);
+      break;
+    case "conversation":
+      renderConversation(container, args as ConversationArgs, app);
       break;
   }
 
