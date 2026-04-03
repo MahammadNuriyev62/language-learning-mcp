@@ -16,6 +16,7 @@ export interface FlashcardArgs {
 interface FlashcardState {
   currentIndex: number;
   ratings: Record<number, string>;
+  resultsSent?: boolean;
 }
 
 export function renderFlashcards(container: HTMLElement, args: FlashcardArgs, app: App): void {
@@ -28,10 +29,11 @@ export function renderFlashcards(container: HTMLElement, args: FlashcardArgs, ap
   const saved = loadWidgetState<FlashcardState>();
   let currentIndex = saved?.currentIndex ?? 0;
   let ratings: Record<number, string> = saved?.ratings ?? {};
+  let resultsSent = saved?.resultsSent ?? false;
   let flipped = false;
 
   function save() {
-    saveWidgetState<FlashcardState>({ currentIndex, ratings });
+    saveWidgetState<FlashcardState>({ currentIndex, ratings, resultsSent });
   }
 
   function draw() {
@@ -81,24 +83,21 @@ export function renderFlashcards(container: HTMLElement, args: FlashcardArgs, ap
       <div class="ll-complete">
         <div class="ll-complete-icon">&#10003;</div>
         <div class="ll-complete-text">All ${cards.length} cards reviewed!</div>
-        <div class="ll-complete-sub">Sending results to Claude...</div>
+        <div class="ll-complete-sub">${resultsSent ? "Results sent to Claude" : "Sending results to Claude..."}</div>
       </div>
     `;
 
-    app.updateModelContext({
-      content: [{
-        type: "text",
-        text: `Flashcard results for '${deckTitle}':\n${lines.join("\n")}`,
-      }],
-    });
+    if (!resultsSent) {
+      resultsSent = true;
+      save();
 
-    app.sendMessage({
-      role: "user",
-      content: [{
-        type: "text",
-        text: "I finished the flashcards. How did I do? Which words should I review more?",
-      }],
-    });
+      app.updateModelContext({
+        content: [{
+          type: "text",
+          text: `Flashcard results for '${deckTitle}':\n${lines.join("\n")}`,
+        }],
+      });
+    }
   }
 
   draw();

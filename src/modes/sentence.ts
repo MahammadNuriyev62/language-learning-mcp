@@ -14,6 +14,7 @@ export interface SentenceArgs {
 interface SentenceState {
   currentIndex: number;
   built: Record<number, string[]>;
+  resultsSent?: boolean;
 }
 
 export function renderSentence(container: HTMLElement, args: SentenceArgs, app: App): void {
@@ -26,6 +27,7 @@ export function renderSentence(container: HTMLElement, args: SentenceArgs, app: 
   const saved = loadWidgetState<SentenceState>();
   let currentIndex = saved?.currentIndex ?? 0;
   let built: Record<number, string[]> = saved?.built ?? {};
+  let resultsSent = saved?.resultsSent ?? false;
   let currentBuilt: string[] = [];
   let currentPool: string[] = [];
 
@@ -37,7 +39,7 @@ export function renderSentence(container: HTMLElement, args: SentenceArgs, app: 
   }
 
   function save() {
-    saveWidgetState<SentenceState>({ currentIndex, built });
+    saveWidgetState<SentenceState>({ currentIndex, built, resultsSent });
   }
 
   function draw() {
@@ -91,24 +93,21 @@ export function renderSentence(container: HTMLElement, args: SentenceArgs, app: 
       <div class="ll-complete">
         <div class="ll-complete-icon">&#10003;</div>
         <div class="ll-complete-text">Sentence builder complete!</div>
-        <div class="ll-complete-sub">Sending results to Claude...</div>
+        <div class="ll-complete-sub">${resultsSent ? "Results sent to Claude" : "Sending results to Claude..."}</div>
       </div>
     `;
 
-    app.updateModelContext({
-      content: [{
-        type: "text",
-        text: `Sentence builder responses for '${title}':\n${lines.join("\n")}`,
-      }],
-    });
+    if (!resultsSent) {
+      resultsSent = true;
+      save();
 
-    app.sendMessage({
-      role: "user",
-      content: [{
-        type: "text",
-        text: "I finished the sentence builder. How did I do?",
-      }],
-    });
+      app.updateModelContext({
+        content: [{
+          type: "text",
+          text: `Sentence builder responses for '${title}':\n${lines.join("\n")}`,
+        }],
+      });
+    }
   }
 
   initExercise();

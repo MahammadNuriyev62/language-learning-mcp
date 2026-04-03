@@ -13,6 +13,7 @@ export interface QuizArgs {
 interface QuizState {
   currentIndex: number;
   choices: Record<number, string>;
+  resultsSent?: boolean;
 }
 
 export function renderQuiz(container: HTMLElement, args: QuizArgs, app: App): void {
@@ -25,10 +26,11 @@ export function renderQuiz(container: HTMLElement, args: QuizArgs, app: App): vo
   const saved = loadWidgetState<QuizState>();
   let currentIndex = saved?.currentIndex ?? 0;
   let choices: Record<number, string> = saved?.choices ?? {};
+  let resultsSent = saved?.resultsSent ?? false;
   let selected: string | null = null;
 
   function save() {
-    saveWidgetState<QuizState>({ currentIndex, choices });
+    saveWidgetState<QuizState>({ currentIndex, choices, resultsSent });
   }
 
   function draw() {
@@ -68,24 +70,21 @@ export function renderQuiz(container: HTMLElement, args: QuizArgs, app: App): vo
       <div class="ll-complete">
         <div class="ll-complete-icon">&#10003;</div>
         <div class="ll-complete-text">Quiz complete!</div>
-        <div class="ll-complete-sub">Sending results to Claude...</div>
+        <div class="ll-complete-sub">${resultsSent ? "Results sent to Claude" : "Sending results to Claude..."}</div>
       </div>
     `;
 
-    app.updateModelContext({
-      content: [{
-        type: "text",
-        text: `Quiz responses for '${title}':\n${lines.join("\n")}`,
-      }],
-    });
+    if (!resultsSent) {
+      resultsSent = true;
+      save();
 
-    app.sendMessage({
-      role: "user",
-      content: [{
-        type: "text",
-        text: "I finished the quiz. How did I do?",
-      }],
-    });
+      app.updateModelContext({
+        content: [{
+          type: "text",
+          text: `Quiz responses for '${title}':\n${lines.join("\n")}`,
+        }],
+      });
+    }
   }
 
   draw();

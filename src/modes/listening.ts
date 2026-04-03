@@ -14,6 +14,7 @@ export interface ListeningArgs {
 interface ListeningState {
   currentIndex: number;
   typed: Record<number, string>;
+  resultsSent?: boolean;
 }
 
 export function renderListening(container: HTMLElement, args: ListeningArgs, app: App): void {
@@ -26,10 +27,11 @@ export function renderListening(container: HTMLElement, args: ListeningArgs, app
   const saved = loadWidgetState<ListeningState>();
   let currentIndex = saved?.currentIndex ?? 0;
   let typed: Record<number, string> = saved?.typed ?? {};
+  let resultsSent = saved?.resultsSent ?? false;
   let showHint = false;
 
   function save() {
-    saveWidgetState<ListeningState>({ currentIndex, typed });
+    saveWidgetState<ListeningState>({ currentIndex, typed, resultsSent });
   }
 
   function draw() {
@@ -81,24 +83,21 @@ export function renderListening(container: HTMLElement, args: ListeningArgs, app
       <div class="ll-complete">
         <div class="ll-complete-icon">&#10003;</div>
         <div class="ll-complete-text">Listening test complete!</div>
-        <div class="ll-complete-sub">Sending results to Claude...</div>
+        <div class="ll-complete-sub">${resultsSent ? "Results sent to Claude" : "Sending results to Claude..."}</div>
       </div>
     `;
 
-    app.updateModelContext({
-      content: [{
-        type: "text",
-        text: `Listening test responses for '${title}':\n${lines.join("\n")}`,
-      }],
-    });
+    if (!resultsSent) {
+      resultsSent = true;
+      save();
 
-    app.sendMessage({
-      role: "user",
-      content: [{
-        type: "text",
-        text: "I finished the listening test. How did I do?",
-      }],
-    });
+      app.updateModelContext({
+        content: [{
+          type: "text",
+          text: `Listening test responses for '${title}':\n${lines.join("\n")}`,
+        }],
+      });
+    }
   }
 
   draw();
