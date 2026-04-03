@@ -137,7 +137,8 @@ function createServer(baseUrl: string): McpServer {
     title: "Fill in the Blank",
     description:
       "Render an interactive fill-in-the-blank exercise. Each sentence contains one " +
-      "or more blanks marked with '___'. User types the missing word(s). " +
+      "or more blanks marked with '___'. Each blank is either a free text input " +
+      "or a dropdown with choices (if options are provided for that blank). " +
       "The widget does NOT check answers. It collects all user inputs and sends " +
       "them back via updateModelContext. You then evaluate correctness.",
     inputSchema: {
@@ -146,6 +147,10 @@ function createServer(baseUrl: string): McpServer {
       sentences: z.array(z.object({
         text: z.string().describe("Sentence with ___ for blanks (e.g. 'Je ___ au marché')"),
         hint: z.string().optional().describe("Optional grammar/vocabulary hint"),
+        options: z.array(z.array(z.string())).optional().describe(
+          "Options per blank. Array of arrays: options[0] are choices for the 1st blank, " +
+          "options[1] for the 2nd, etc. Omit or pass empty array for free text input."
+        ),
       })).describe("Array of sentences with blanks"),
     },
     ...uiMeta,

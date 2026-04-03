@@ -2,6 +2,7 @@ import type { App } from "@modelcontextprotocol/ext-apps";
 import { saveWidgetState, loadWidgetState } from "../../storage";
 import { esc, sectionTypeLabel } from "./helpers";
 import { renderSection } from "./sections";
+import { renderSectionReview } from "./review";
 import { buildResults } from "./results";
 import { setupEventHandlers } from "./events";
 import type { TestArgs, TestState } from "./types";
@@ -22,6 +23,8 @@ export function renderTest(container: HTMLElement, args: TestArgs, app: App): vo
     resultsSent: saved?.resultsSent ?? false,
   };
 
+  let reviewing = false;
+
   for (let i = 0; i < sections.length; i++) {
     if (!state.sections[i]) state.sections[i] = { answers: {} };
   }
@@ -31,6 +34,11 @@ export function renderTest(container: HTMLElement, args: TestArgs, app: App): vo
   }
 
   function draw() {
+    if (reviewing) {
+      drawReview();
+      return;
+    }
+
     if (state.submitted) {
       drawSubmitted();
       return;
@@ -73,6 +81,7 @@ export function renderTest(container: HTMLElement, args: TestArgs, app: App): vo
         <div class="ll-complete-icon">&#10003;</div>
         <div class="ll-complete-text">Test complete!</div>
         <div class="ll-complete-sub">${state.resultsSent ? "Results sent to Claude" : "Sending results to Claude..."}</div>
+        <button class="ll-btn test-review-btn" data-action="review">Review Answers</button>
       </div>
     `;
 
@@ -85,6 +94,52 @@ export function renderTest(container: HTMLElement, args: TestArgs, app: App): vo
     }
   }
 
+  function drawReview() {
+    let html = `
+      <button class="ll-btn test-back-btn" data-action="back">&larr; Back</button>
+      <div class="test-header">
+        <div class="test-title">${esc(title)}</div>
+        <div class="test-subtitle">Review <span class="test-review-badge">read-only</span></div>
+      </div>
+    `;
+
+    sections.forEach((section, si) => {
+      html += `<div class="test-section" id="section-${si}">`;
+      html += `<div class="test-section-header">
+        <span class="test-section-num">Section ${si + 1}</span>
+        <span class="test-section-title">${esc(section.title)}</span>
+        <span class="test-section-type">${sectionTypeLabel(section.type)}</span>
+      </div>`;
+
+      if (section.instructions) {
+        html += `<div class="test-instructions">${esc(section.instructions)}</div>`;
+      }
+
+      html += renderSectionReview(section, si, state.sections[si]);
+      html += `</div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
   draw();
+
+  // Handle review/back navigation
+  container.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+
+    if (target.closest("[data-action='review']")) {
+      reviewing = true;
+      draw();
+      return;
+    }
+
+    if (target.closest("[data-action='back']")) {
+      reviewing = false;
+      draw();
+      return;
+    }
+  });
+
   setupEventHandlers(container, state, save, draw);
 }

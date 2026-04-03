@@ -545,6 +545,74 @@ body {
   background: var(--color-background-secondary, light-dark(rgba(0,0,0,0.03), rgba(255,255,255,0.05)));
 }
 
+.fill-select-wrapper {
+  display: inline-block;
+  position: relative;
+  margin: 0 4px;
+  vertical-align: baseline;
+}
+
+.fill-select {
+  display: inline-block;
+  min-width: 100px;
+  padding: 4px 24px 4px 8px;
+  border: none;
+  border-bottom: 2px solid var(--color-text-info, light-dark(#4338ca, #818cf8));
+  background: transparent;
+  color: var(--color-text-tertiary, light-dark(#9ca3af, #6b7280));
+  font-size: var(--font-text-md-size, 1rem);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+}
+
+.fill-select.fill-select-chosen {
+  color: var(--color-text-primary, inherit);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.fill-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  min-width: 140px;
+  margin-top: 4px;
+  padding: 4px 0;
+  background: var(--color-background-primary, white);
+  border: 1px solid var(--color-border-secondary, light-dark(rgba(0,0,0,0.15), rgba(255,255,255,0.15)));
+  border-radius: var(--border-radius-md, 8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.fill-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary, inherit);
+  font-size: var(--font-text-md-size, 1rem);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.fill-dropdown-item:hover {
+  background: var(--color-background-secondary, light-dark(rgba(0,0,0,0.05), rgba(255,255,255,0.08)));
+}
+
+.fill-dropdown-item.active {
+  color: var(--color-text-info, light-dark(#4338ca, #818cf8));
+  font-weight: var(--font-weight-semibold, 600);
+}
+
 .fill-hint {
   font-size: var(--font-text-sm-size, 0.875rem);
   color: var(--color-text-secondary, light-dark(#6b7280, #9ca3af));
@@ -902,6 +970,82 @@ body {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+}
+
+.test-preview-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.test-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border-secondary, light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.08)));
+  border-radius: var(--border-radius-md, 8px);
+  font-size: var(--font-text-sm-size, 0.875rem);
+}
+
+.test-review-btn {
+  margin-top: 12px;
+}
+
+.test-back-btn {
+  display: block;
+  margin: 0 auto 16px;
+}
+
+.test-review-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-sm, 4px);
+  background: var(--color-background-secondary, light-dark(rgba(0,0,0,0.05), rgba(255,255,255,0.08)));
+  font-size: var(--font-text-sm-size, 0.75rem);
+  color: var(--color-text-secondary, light-dark(#6b7280, #9ca3af));
+  margin-left: 4px;
+}
+
+.test-review-answer {
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-info, light-dark(#4338ca, #818cf8));
+}
+
+.test-review-inline {
+  display: inline;
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-info, light-dark(#4338ca, #818cf8));
+  border-bottom: 2px solid var(--color-text-info, light-dark(#4338ca, #818cf8));
+  padding: 0 4px;
+  margin: 0 2px;
+}
+
+.test-review-matches {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.test-review-match-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.test-review-match-left {
+  font-weight: var(--font-weight-semibold, 600);
+  min-width: 100px;
+}
+
+.test-review-match-arrow {
+  color: var(--color-text-tertiary, light-dark(#9ca3af, #6b7280));
+}
+
+.test-review-match-right {
+  color: var(--color-text-info, light-dark(#4338ca, #818cf8));
+  font-weight: var(--font-weight-semibold, 600);
 }
 
 .test-submit-btn {

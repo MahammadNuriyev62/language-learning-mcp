@@ -7,6 +7,7 @@ export interface FillBlankArgs {
   sentences: Array<{
     text: string;
     hint?: string;
+    options?: string[][];
   }>;
 }
 
@@ -27,6 +28,7 @@ export function renderFillBlank(container: HTMLElement, args: FillBlankArgs, app
   let currentIndex = saved?.currentIndex ?? 0;
   let answers: Record<number, string[]> = saved?.answers ?? {};
   let resultsSent = saved?.resultsSent ?? false;
+  let openDropdown: number | null = null;
 
   function save() {
     saveWidgetState<FillBlankState>({ currentIndex, answers, resultsSent });
@@ -45,6 +47,7 @@ export function renderFillBlank(container: HTMLElement, args: FillBlankArgs, app
     const s = sentences[currentIndex];
     const blanks = countBlanks(s.text);
     const parts = s.text.split("___");
+    const currentAnswers = answers[currentIndex] || [];
 
     let html = `
       <div class="ll-header">
@@ -57,7 +60,28 @@ export function renderFillBlank(container: HTMLElement, args: FillBlankArgs, app
     for (let i = 0; i < parts.length; i++) {
       html += `<span>${esc(parts[i])}</span>`;
       if (i < blanks) {
-        html += `<input type="text" class="fill-input" data-blank="${i}" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false">`;
+        const blankOptions = s.options?.[i];
+        const chosen = currentAnswers[i] || "";
+
+        if (blankOptions?.length) {
+          // Dropdown blank
+          const isOpen = openDropdown === i;
+          html += `<span class="fill-select-wrapper">`;
+          html += `<button class="fill-select${chosen ? " fill-select-chosen" : ""}" data-toggle-dropdown="${i}">`;
+          html += chosen ? esc(chosen) : "...";
+          html += `</button>`;
+          if (isOpen) {
+            html += `<div class="fill-dropdown">`;
+            blankOptions.forEach((opt) => {
+              html += `<button class="fill-dropdown-item${chosen === opt ? " active" : ""}" data-pick-option="${escAttr(opt)}" data-blank="${i}">${esc(opt)}</button>`;
+            });
+            html += `</div>`;
+          }
+          html += `</span>`;
+        } else {
+          // Text input blank
+          html += `<input type="text" class="fill-input" data-blank="${i}" value="${escAttr(chosen)}" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false">`;
+        }
       }
     }
 
@@ -69,8 +93,11 @@ export function renderFillBlank(container: HTMLElement, args: FillBlankArgs, app
 
     container.innerHTML = html;
 
-    const firstInput = container.querySelector("[data-blank='0']") as HTMLInputElement;
-    firstInput?.focus();
+    // Focus first empty text input
+    if (openDropdown === null) {
+      const emptyInput = container.querySelector<HTMLInputElement>(".fill-input:placeholder-shown");
+      emptyInput?.focus();
+    }
   }
 
   function drawComplete() {
@@ -114,18 +141,59 @@ export function renderFillBlank(container: HTMLElement, args: FillBlankArgs, app
   container.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
 
+    // Toggle dropdown
+    const toggleBtn = target.closest("[data-toggle-dropdown]") as HTMLElement | null;
+    if (toggleBtn) {
+      const idx = parseInt(toggleBtn.dataset.toggleDropdown!, 10);
+      openDropdown = openDropdown === idx ? null : idx;
+      draw();
+      return;
+    }
+
+    // Pick option from dropdown
+    const pickBtn = target.closest("[data-pick-option]") as HTMLElement | null;
+    if (pickBtn) {
+      const blankIdx = parseInt(pickBtn.dataset.blank!, 10);
+      const value = pickBtn.dataset.pickOption!;
+      if (!answers[currentIndex]) answers[currentIndex] = [];
+      answers[currentIndex][blankIdx] = value;
+      openDropdown = null;
+      save();
+      draw();
+      return;
+    }
+
+    // Close dropdown on outside click
+    if (openDropdown !== null && !target.closest(".fill-select-wrapper")) {
+      openDropdown = null;
+      draw();
+      return;
+    }
+
+    // Submit
     if (target.closest("[data-action='submit']")) {
-      const inputs = container.querySelectorAll<HTMLInputElement>(".fill-input");
+      const s = sentences[currentIndex];
+      const blanks = countBlanks(s.text);
       const values: string[] = [];
       let allFilled = true;
-      inputs.forEach((inp) => {
-        const v = inp.value.trim();
-        if (!v) allFilled = false;
-        values.push(v);
-      });
+
+      for (let i = 0; i < blanks; i++) {
+        if (s.options?.[i]?.length) {
+          const val = answers[currentIndex]?.[i] || "";
+          if (!val) allFilled = false;
+          values.push(val);
+        } else {
+          const input = container.querySelector<HTMLInputElement>(`[data-blank="${i}"]`);
+          const val = input?.value.trim() || "";
+          if (!val) allFilled = false;
+          values.push(val);
+        }
+      }
+
       if (!allFilled) return;
       answers[currentIndex] = values;
       currentIndex++;
+      openDropdown = null;
       save();
       draw();
     }
@@ -143,4 +211,8 @@ function esc(str: string): string {
   const el = document.createElement("span");
   el.textContent = str;
   return el.innerHTML;
+}
+
+function escAttr(str: string): string {
+  return str.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }

@@ -21,6 +21,12 @@ import "./mcp-app.css";
 
 const appEl = document.getElementById("app")!;
 
+function escapeHtml(str: string): string {
+  const el = document.createElement("span");
+  el.textContent = str;
+  return el.innerHTML;
+}
+
 type Mode = "pronounce" | "flashcards" | "quiz" | "listening" | "sentence" | "fill_blank" | "matching" | "scramble" | "conversation" | "test" | null;
 let currentMode: Mode = null;
 let currentArgs: any = null;
@@ -56,6 +62,30 @@ function render() {
   appEl.appendChild(container);
 
   if (args.language) setLanguage(args.language);
+
+  // During streaming, show a lightweight preview for test mode
+  // to avoid destroying interactive DOM on every partial update
+  if (isStreaming && mode === "test") {
+    const testArgs = args as TestArgs;
+    const sectionCount = testArgs.sections?.length ?? 0;
+    const sectionNames = (testArgs.sections || []).map((s: any) => s.title || s.type || "...").filter(Boolean);
+    container.innerHTML = `
+      <div class="test-header">
+        <div class="test-title">${testArgs.title ? escapeHtml(testArgs.title) : "Loading..."}</div>
+        <div class="test-subtitle">Building test... ${sectionCount} section${sectionCount !== 1 ? "s" : ""}</div>
+      </div>
+      <div class="test-preview-sections">
+        ${sectionNames.map((name: string, i: number) => `
+          <div class="test-preview-item">
+            <span class="test-section-num">Section ${i + 1}</span>
+            <span>${escapeHtml(name)}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+    resizeToContent();
+    return;
+  }
 
   switch (mode) {
     case "pronounce":
@@ -123,10 +153,12 @@ app.onteardown = async () => {
 };
 
 let renderTimer: ReturnType<typeof setTimeout> | null = null;
+let isStreaming = false;
 
 app.ontoolinputpartial = (params: any) => {
   const args = params.arguments;
   if (!args) return;
+  isStreaming = true;
   currentMode = detectMode(args);
   currentArgs = args;
   if (renderTimer) return;
@@ -137,6 +169,7 @@ app.ontoolinputpartial = (params: any) => {
 };
 
 app.ontoolinput = (params: any) => {
+  isStreaming = false;
   currentArgs = params.arguments ?? {};
   currentMode = detectMode(currentArgs);
   render();
